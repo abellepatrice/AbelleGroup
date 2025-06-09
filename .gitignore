@@ -1,0 +1,12 @@
+# Node
+backend/node_modules/
+backend/.env
+
+# React Native
+frontend/node_modules/
+frontend/.env
+*.log
+
+# macOS/Linux/Windows junk
+.DS_Store
+Thumbs.db
