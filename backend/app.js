@@ -31,6 +31,9 @@ app.use('/api/loan', loanRoutes);
 app.use('/api/repayment', repaymentRoutes);
 app.use('/api/upload', uploadRoutes); // Upload route
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 // Test route
 app.get('/', (req, res) => {
   res.send('Loan App Backend is running');

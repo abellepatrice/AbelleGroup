@@ -6,15 +6,23 @@ const authMiddleware = require('../middleware/auth'); // middleware to verify JW
 
 router.post('/apply', authMiddleware, async (req, res) => {
   try {
-    const { amount, durationMonths } = req.body;
+    const { amount, durationMonths, purpose } = req.body;
 
-    if (!amount || !durationMonths) {
-      return res.status(400).json({ message: 'Amount and duration are required' });
+    if (!amount || !durationMonths || !purpose) {
+      return res.status(400).json({ message: 'Fill in all fields' });
+    }
+    // Extra validation
+    if (amount > 7000) {
+      return res.status(400).json({ error: 'Maximum loan amount is 7000' });
+    }
+    if (durationMonths > 3) {
+      return res.status(400).json({ error: 'Maximum duration is 3 months' });
     }
     const loan = new Loan({
       userId: req.user.id,
       amount,
       durationMonths,
+      purpose
     });
 
     await loan.save();
