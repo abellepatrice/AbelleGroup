@@ -3,8 +3,9 @@ const router = express.Router();
 const Loan = require('../models/Loan');
 const Repayment = require('../models/Repayment');
 const authMiddleware = require('../middleware/auth'); // middleware to verify JWT
+const authenticateToken = require('../middleware/auth');
 
-router.post('/apply', authMiddleware, async (req, res) => {
+router.post('/apply', authenticateToken, async (req, res) => {
   try {
     const { amount, durationMonths, purpose } = req.body;
 

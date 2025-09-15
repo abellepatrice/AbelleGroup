@@ -6,6 +6,7 @@ const passport = require('passport');
 const path = require('path');
 const multer = require('multer');
 const User = require('../models/User');
+const Token =require('../models/Token')
 const { JWT_SECRET } = require('../config/keys');
 
 // ======================
@@ -70,31 +71,109 @@ router.post('/signup', upload.single('profileImage'), async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-
-// ======================
-// Simple Signup 2 (No Image)
-// ======================
-router.post('/signup-2', async (req, res) => {
-  const { username, email, password } = req.body;
-
-  try {
-    const exists = await User.findOne({ username });
-    if (exists) return res.status(400).json({ message: 'User already exists' });
-
-    const hashed = await bcrypt.hash(password, 10);
-    const user = new User({ username, email, password: hashed });
-    await user.save();
-
-    res.status(201).json({ message: 'User created successfully' });
-  } catch (err) {
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
 // ======================
 // Login Route
 // ======================
 router.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    const user = await User.findOne({
+      $or: [{ username }, { email: username }]
+    });
+
+    if (!user) {
+      return res.status(400).json({ error: 'Invalid username or password' });
+    }
+
+    const isValid = await bcrypt.compare(password, user.password);
+    if (!isValid) {
+      return res.status(400).json({ error: 'Invalid username or password' });
+    }
+
+    const accessToken = jwt.sign(
+      { id: user._id, username: user.username, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+   const refreshToken = jwt.sign(
+    { id: user._id }, 
+    process.env.JWT_REFRESH_SECRET,
+     { expiresIn: '7d' }
+    );
+   await Token.create({ userId: user._id, token: refreshToken });
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    });
+
+    res.json({
+      accessToken,
+      role: user.role,
+      username: user.username,
+      message: 'Login successful'
+    });
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// ======================
+// Refresh Route
+// ======================
+router.post('/refresh', async (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+
+  if (!refreshToken) {
+    return res.status(401).json({ error: 'No refresh token provided' });
+  }
+
+  try {
+    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+
+    const storedToken = await Token.findOne({ userId: decoded.id, token: refreshToken });
+    if (!storedToken) {
+      return res.status(403).json({ error: 'Invalid refresh token' });
+    }
+
+    const newAccessToken = jwt.sign(
+      { id: decoded.id },
+      process.env.JWT_SECRET,
+      { expiresIn: '15m' }
+    );
+
+    res.json({ accessToken: newAccessToken });
+  } catch (err) {
+    console.error('Refresh error:', err);
+    res.status(403).json({ error: 'Invalid or expired refresh token' });
+  }
+});
+
+// ======================
+// Logout Route
+// ======================
+router.post('/logout', async (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+
+  if (refreshToken) {
+    try {
+      const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+      await Token.deleteOne({ userId: decoded.id, token: refreshToken }); 
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
+  }
+
+  res.clearCookie('refreshToken');
+  res.json({ message: 'Logged out successfully' });
+});
+
+router.post('/login-1', async (req, res) => {
   const { username, password } = req.body;
 
   try {
