@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Loan = require('../models/Loan');
 const Repayment = require('../models/Repayment');
-const authMiddleware = require('../middleware/auth'); // middleware to verify JWT
+const authMiddleware = require('../middleware/auth');
 const authenticateToken = require('../middleware/auth');
 
 router.post('/apply', authenticateToken, async (req, res) => {
@@ -34,7 +34,7 @@ router.post('/apply', authenticateToken, async (req, res) => {
   }
 });
 
-router.get('/my-loans', authMiddleware, async (req, res) => {
+router.get('/my-loans', authenticateToken, async (req, res) => {
   try {
     const loans = await Loan.find({ userId: req.user.id }).sort({ createdAt: -1 });
 
@@ -65,7 +65,6 @@ router.post('/repay/:loanId', authMiddleware, async (req, res) => {
       return res.status(400).json({ message: 'Loan is not approved for repayment' });
     }
 
-    // Calculate total paid so far
     const repayments = await Repayment.find({ loanId: loan._id });
     const totalPaid = repayments.reduce((sum, r) => sum + r.amount, 0);
     const remaining = loan.amount - totalPaid;
@@ -82,7 +81,6 @@ router.post('/repay/:loanId', authMiddleware, async (req, res) => {
     });
     await repayment.save();
 
-    // Update loan status if fully paid
     if (totalPaid + amount >= loan.amount) {
       loan.status = 'paid';
       await loan.save();
@@ -99,14 +97,9 @@ router.get('/balance/:loanId', authMiddleware, async (req, res) => {
   const loan = await Loan.findById(req.params.loanId);
   if (!loan) return res.status(404).json({ message: 'Loan not found' });
 
-  // Option 1: Use loan.balance
   return res.status(200).json({ balance: loan.balance });
 
-  // OR Option 2: Calculate from repayments
-  // const repayments = await Repayment.find({ loanId: loan._id });
-  // const totalPaid = repayments.reduce((sum, r) => sum + r.amountPaid, 0);
-  // const balance = loan.amount - totalPaid;
-  // return res.status(200).json({ balance });
+ 
 });
 
 

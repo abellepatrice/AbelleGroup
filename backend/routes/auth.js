@@ -55,16 +55,25 @@ router.post('/signup', upload.single('profileImage'), async (req, res) => {
 
     await newUser.save();
 
-    const token = jwt.sign(
+    const accessToken = jwt.sign(
       { id: newUser._id, email: newUser.email, role: newUser.role },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
 
     res.status(201).json({
-      token,
-      role: newUser.role,
-      message: 'User created successfully'
+      accessToken,
+      message: 'User created successfully',
+      user: {
+        id: newUser._id,
+        username: newUser.username,
+        email: newUser.email,
+        phone: newUser.phone,
+        dob: newUser.dob,
+        profileImage: newUser.profileImage,
+        role: newUser.role,
+        createdAt: newUser.createdAt
+      }
     });
   } catch (err) {
     console.error('Signup error:', err);
@@ -113,9 +122,17 @@ router.post('/login', async (req, res) => {
 
     res.json({
       accessToken,
-      role: user.role,
-      username: user.username,
-      message: 'Login successful'
+      message: 'Login successful',
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        phone: user.phone,
+        dob: user.dob,
+        profileImage: user.profileImage,
+        role: user.role,
+        createdAt: user.createdAt
+      }
     });
   } catch (err) {
     console.error('Login error:', err);
