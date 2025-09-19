@@ -63,6 +63,7 @@ git clone https://github.com/abellepatrice/AbelleGroup.git
 cd AbelleGroup
 
 2. Backend setup
+
 cd backend
 
 npm install
@@ -73,28 +74,42 @@ npm run dev            # or npm start
 
 3. Frontend setup
 cd frontend
+
 npm install
+
 npm start
+
 # Run on device or emulator:
+
 npx react-native run-android
 npx react-native run-ios
 
 API Routes (Backend)
 Endpoint	Method	Description
 /api/auth/register	POST	Create user account
+
 /api/auth/login	POST	Login & get JWT
+
 /api/loans/apply	POST	Apply for a loan
+
 /api/loans	GET	Fetch user loans
+
 /api/admin/loans	GET	Admin: view all loans
+
 /api/admin/loans/:id/approve	PATCH	Approve a loan
+
 /api/admin/loans/:id/reject	PATCH	Reject a loan
+
 /api/users/:id	PUT	Update user profile
+
 Environment Variables
 
 Backend .env file:
 
 PORT=5000
-DB_URL=mongodb://localhost:27017/abelle-group
+
+DB_URL=mongodb://localhost:27017/AbelleGroup
+
 JWT_SECRET=your_secret_key
 
 
@@ -129,6 +144,7 @@ Email: abellepatrice@gmail.com
 
 **Request Body**
 json
+
 {
   "username": "john_doe",
   "email": "john@example.com",
@@ -139,7 +155,6 @@ json
 Response
 
 json
-Copy code
 {
   "message": "User registered successfully",
   "user": {
@@ -149,12 +164,13 @@ Copy code
   }
 }
 Login User
+
 POST /api/auth/login
 
 Request Body
 
 json
-Copy code
+
 {
   "email": "john@example.com",
   "password": "StrongPass123!"
@@ -162,7 +178,7 @@ Copy code
 Response
 
 json
-Copy code
+
 {
   "token": "eyJhbGciOiJIUzI1NiIs...",
   "user": {
@@ -172,13 +188,15 @@ Copy code
   }
 }
 Loans
+
 Apply for a Loan
+
 POST /api/loans/apply
 
 Request Body
 
 json
-Copy code
+
 {
   "amount": 5000,
   "term": 6,
@@ -188,7 +206,7 @@ Copy code
 Response
 
 json
-Copy code
+
 {
   "message": "Loan application submitted",
   "loan": {
@@ -200,17 +218,19 @@ Copy code
   }
 }
 Get My Loans
+
 GET /api/loans
 
 Headers
 
 makefile
-Copy code
+
 Authorization: Bearer <token>
+
 Response
 
 json
-Copy code
+
 [
   {
     "id": "651001d8e7892c1234567890",
@@ -227,17 +247,19 @@ Copy code
 ]
 Admin
 Get All Loan Applications
+
 GET /api/admin/loans
 
 Headers
 
 makefile
-Copy code
+
 Authorization: Bearer <admin_token>
+
 Response
 
 json
-Copy code
+
 [
   {
     "id": "651001d8e7892c1234567890",
@@ -258,7 +280,7 @@ PATCH /api/admin/loans/:id/approve
 Response
 
 json
-Copy code
+
 {
   "message": "Loan approved",
   "loan": {
@@ -272,7 +294,7 @@ PATCH /api/admin/loans/:id/reject
 Response
 
 json
-Copy code
+
 {
   "message": "Loan rejected",
   "loan": {
@@ -287,12 +309,12 @@ GET /api/users/:id
 Headers
 
 makefile
-Copy code
+
 Authorization: Bearer <token>
 Response
 
 json
-Copy code
+
 {
   "id": "650ff1cda15b5a1234567890",
   "username": "john_doe",
@@ -308,7 +330,7 @@ PUT /api/users/:id
 Request Body
 
 json
-Copy code
+
 {
   "username": "john_updated",
   "email": "john.new@example.com",
@@ -317,7 +339,7 @@ Copy code
 Response
 
 json
-Copy code
+
 {
   "message": "Profile updated successfully",
   "user": {
