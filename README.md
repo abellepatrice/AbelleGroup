@@ -31,14 +31,23 @@ AbelleGroup is a loan management system with:
 
 AbelleGroup/
 ├── backend/ # Node.js + Express server
+
 │ ├── models/ # Mongoose models (User, Loan, etc.)
+
 │ ├── routes/ # API endpoints
+
 │ ├── controllers/ # Business logic
+
 │ └── index.js # App entry point
+
 ├── frontend/ # React Native mobile dashboard
+
 │ ├── src/screens/ # Dashboard, Signup, Loan Application, etc.
+
 │ ├── src/components/
+
 │ └── App.js
+
 └── README.md
 
 
@@ -50,12 +59,16 @@ AbelleGroup/
 ### 1. Clone repo
 
 git clone https://github.com/abellepatrice/AbelleGroup.git
+
 cd AbelleGroup
 
 2. Backend setup
 cd backend
+
 npm install
+
 cp .env.example .env   # configure DB_URL, JWT_SECRET, PORT
+
 npm run dev            # or npm start
 
 3. Frontend setup
