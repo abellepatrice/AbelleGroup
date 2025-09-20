@@ -38,10 +38,17 @@ router.get('/my-loans', authenticateToken, async (req, res) => {
   try {
     const loans = await Loan.find({ userId: req.user.id }).sort({ createdAt: -1 });
 
-    res.status(200).json({ loans });
+    res.status(200).json({ 
+      loans,
+      message: "Loans fetched succesfully"       
+    });
   } catch (error) {
-    console.error('Get loans error:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Get loans error:', error.message);
+
+    res.status(500).json({
+      message: 'Failed to fetch loans',
+      error: error.message 
+    });
   }
 });
 
