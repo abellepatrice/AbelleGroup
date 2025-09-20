@@ -12,6 +12,7 @@ function authenticateToken(req, res, next) {
 
   const token = authHeader.split(' ')[1];
 
+  
   jwt.verify(token, JWT_SECRET, (err, decoded) => {
     if (err) {
       if (err.name === 'TokenExpiredError') {
