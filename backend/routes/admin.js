@@ -1,8 +1,8 @@
-// routes/admin.js
 const express = require('express');
 const router = express.Router();
 const Loan = require('../models/Loan');
 const User = require('../models/User');
+const Feedback = require('../models/Feedback')
 const authMiddleware = require('../middleware/auth');
 const isAdmin = require('../middleware/isAdmin');
 
@@ -68,6 +68,64 @@ router.get('/users', authMiddleware, isAdmin, async (req, res) => {
   } catch (error) {
     console.error('Get users error:', error);
     res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+router.get('/feedbacks', authMiddleware, async (req, res) => {
+  try {
+    const feedbacks = await Feedback.find()
+      .populate("userId", "username email")
+      .sort({ createdAt: -1 });
+    res.status(200).json({ feedbacks });
+  } catch (err) {
+    console.error("Error fetching feedbacks:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+router.put('/feedbacks/:id', authMiddleware, async (req, res) => {
+  try {
+    const feedback = await Feedback.findById(req.params.id);
+
+    if (!feedback) {
+      return res.status(404).json({ message: "Feedback not found" });
+    }
+
+    if (feedback.userId.toString() !== req.user.id && req.user.role !== "admin") {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    const { rating, feedback: feedbackText } = req.body;
+    if (rating !== undefined) feedback.rating = rating;
+    if (feedbackText !== undefined) feedback.feedback = feedbackText;
+
+    const updated = await feedback.save();
+    res.json(updated);
+  } catch (err) {
+    console.error("Error updating feedback:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.delete('/feedbacks/:id', authMiddleware, async (req, res) => {
+  try {
+    const feedback = await Feedback.findById(req.params.id);
+
+    if (!feedback) {
+      return res.status(404).json({ message: "Feedback not found" });
+    }
+
+    if (feedback.userId.toString() !== req.user.id && req.user.role !== "admin") {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    await feedback.deleteOne();
+    res.json({ message: "Feedback deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting feedback:", err);
+    res.status(500).json({ message: "Server error" });
   }
 });
 

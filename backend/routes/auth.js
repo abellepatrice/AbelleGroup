@@ -111,7 +111,7 @@ router.post('/login', async (req, res) => {
     process.env.JWT_REFRESH_SECRET,
      { expiresIn: '7d' }
     );
-   await Token.create({ userId: user._id, token: refreshToken });
+   await Token.create({ userId: user._id, token: refreshToken, role: user.role });
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
@@ -159,9 +159,9 @@ router.post('/refresh', async (req, res) => {
     }
 
     const newAccessToken = jwt.sign(
-      { id: decoded.id },
+      { id: decoded.id, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: '15m' }
+      { expiresIn: '7d' }
     );
 
     res.json({ accessToken: newAccessToken });

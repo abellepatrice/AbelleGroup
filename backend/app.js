@@ -14,6 +14,7 @@ const loanRoutes = require('./routes/loan');
 const adminRoutes = require('./routes/admin');
 const repaymentRoutes = require('./routes/repayment');
 const uploadRoutes = require('./routes/upload');
+const feedbackRoutes = require('./routes/feedback');
 
 const app = express();
 
@@ -29,7 +30,10 @@ app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/loan', loanRoutes);
 app.use('/api/repayment', repaymentRoutes);
-app.use('/api/upload', uploadRoutes); // Upload route
+app.use('/api/upload', uploadRoutes); 
+app.use("/api/feedback", feedbackRoutes);
+
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
