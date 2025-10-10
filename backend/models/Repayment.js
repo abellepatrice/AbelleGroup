@@ -1,21 +1,18 @@
-const mongoose = require('mongoose');
-// const User = require('./User');
-// const Loan = require('./Loan');
+const mongoose = require("mongoose");
 
-const repaymentSchema = new mongoose.Schema({
-  loanId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Loan',
-    required: true
+const repaymentSchema = new mongoose.Schema(
+  {
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    loanId: { type: mongoose.Schema.Types.ObjectId, ref: "Loan" },
+    transactionId: { type: String, unique: true },
+    amountPaid: Number,
+    phone: String,
+    date: String,
+    reference: String,
+    balanceRemaining: Number,
+    raw: Object 
   },
-  amount: {
-    type: Number,
-    required: true
-  },
-  paidAt: {
-    type: Date,
-    default: Date.now
-  }
-});
+  { timestamps: true }
+);
 
-module.exports = mongoose.model('Repayment', repaymentSchema);
+module.exports = mongoose.model("Repayment", repaymentSchema);
