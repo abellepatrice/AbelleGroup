@@ -6,7 +6,15 @@ const Feedback = require('../models/Feedback')
 const authMiddleware = require('../middleware/auth');
 const isAdmin = require('../middleware/isAdmin');
 
-// Get all loan applications
+router.get('/profile', authMiddleware, isAdmin, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: 'Server Error' });
+  }
+});
+
 router.get('/loans', authMiddleware, isAdmin, async (req, res) => {
   try {
     const loans = await Loan.find().populate('userId', 'username email');
@@ -16,7 +24,6 @@ router.get('/loans', authMiddleware, isAdmin, async (req, res) => {
   }
 });
 
-// Approve or reject a loan
 router.patch('/loans/:id', authMiddleware, isAdmin, async (req, res) => {
   const { status } = req.body;
   if (!['approved', 'rejected'].includes(status)) {
@@ -63,7 +70,7 @@ router.put('/loan/:id', authMiddleware, isAdmin, async (req, res) => {
 
 router.get('/users', authMiddleware, isAdmin, async (req, res) => {
   try {
-    const users = await User.find().select('-password'); // exclude passwords
+    const users = await User.find().select('-password'); 
     res.status(200).json({ users });
   } catch (error) {
     console.error('Get users error:', error);

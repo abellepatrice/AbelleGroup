@@ -3,8 +3,6 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const passport = require('passport');
 require('dotenv').config();
-
-// Passport config
 require('./config/passport'); 
 
 // Route imports
@@ -18,8 +16,15 @@ const feedbackRoutes = require('./routes/feedback');
 const app = express();
 
 // Middleware
-app.use(cors());
-app.use('/uploads', express.static('uploads')); // Serve uploaded files
+// app.use(cors());
+app.use(cors({
+  origin: "*",            
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
+}));
+
+app.use('/uploads', express.static('uploads')); 
 app.use(bodyParser.json());
 app.use(passport.initialize());
 

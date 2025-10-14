@@ -3,10 +3,11 @@ backend/node_modules/
 backend/.env
 
 # React Native
-frontend/node_modules/
-frontend/.env
+frontend/AdminDashboard/node_modules/
+frontend/AdminDashboard/.env
 *.log
 
 # macOS/Linux/Windows junk
 .DS_Store
 Thumbs.db
+
